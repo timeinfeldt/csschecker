@@ -1,0 +1,19 @@
+{
+    "name": "ololrofler/csschecker",
+    "type": "cli mopped",
+    "description": "Chex yo CESSS",
+    "keywords": ["css", "checker", "cli"],
+    "homepage": "1337h4x0rz.org",
+    "license": "MIT",
+    "authors": [
+        {"name": "fif"}
+    ],
+    "require": {
+        "php": ">=5.3.3",
+		"sabberworm/php-css-parser": "5.*"	
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*",
+		"whatthejeff/nyancat-phpunit-resultprinter": "1.1.*"
+    }
+}
