@@ -2,6 +2,9 @@
 <?php
 namespace csschecker;
 
+use csschecker\reports\CheckstyleReport;
+use csschecker\reports\CompositeReport;
+use csschecker\reports\FileReport;
 use csschecker\reports\Report;
 
 require_once(__DIR__ . '/vendor/autoload.php');
@@ -20,6 +23,10 @@ $args = $_SERVER['argv'];
 unset($args[0]);
 
 $checker = new CssChecker;
-$report = new Report;
+$report = new CompositeReport(array(
+    new FileReport(STDOUT),
+    new FileReport(fopen('r', __DIR__ . '/result.txt')),
+    new CheckstyleReport(__DIR__ . '/checkstyle.xml')
+));
 
 $checker->runChecks($args, $checks, $report);
