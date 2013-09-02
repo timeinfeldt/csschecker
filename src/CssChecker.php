@@ -1,26 +1,21 @@
 <?php
+namespace csschecker;
 
 class CssChecker {
 
     private $selectors = array();
 
-    private $classes = array();
-
-    private $warnings = array();
-	
-	private $isVerbose = false;
+    private $isVerbose = false;
 
     public function runChecks($options, $checksConfig, Report $report) {
-		
-		// mark the start time
-		$start_time = microtime(true);
+        $start_time = microtime(true);
 
         $paths = array();
 
         while (($arg = array_shift($options)) !== null) {
             switch ($arg) {
                 case '--verbose':
-					$this->isVerbose = true;
+                    $this->isVerbose = true;
                     break;
                 case '--something':
                     $arg = array_shift($options);
@@ -86,11 +81,11 @@ class CssChecker {
 
         foreach ($cssFiles as $cssFileName => $cssFileObject) {
 
-			if($this->isVerbose){
-				print_r("Collecting CSS selectors from: " . $cssFileName . "\n");
-			}
+            if($this->isVerbose){
+                print_r("Collecting CSS selectors from: " . $cssFileName . "\n");
+            }
 
-			$oSettings = Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
+            $oSettings = Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
             $oCssParser = new Sabberworm\CSS\Parser(file_get_contents($cssFileName), $oSettings);
             $oCss = $oCssParser->parse();
 
@@ -137,21 +132,21 @@ class CssChecker {
 
     public function getClassesInSelector($selector) {
         $classNames = $this->getClassesInSelectorString($selector['string']);
-		$classes = array();
+        $classes = array();
 
-		foreach($classNames as $className) {
+        foreach($classNames as $className) {
             $classes[] = array(
                 'name' => $className,
                 'defLocation' => $selector['defLocation']
             );
-		}
-		
+        }
+
         return $classes;
     }
-	
+
     public function getClassesInSelectorString($selectorString) {
-		$matches = array();
-		preg_match_all("(\.(?P<classes>-?[_a-zA-Z][_a-zA-Z0-9-]*))", $selectorString, $matches);
+        $matches = array();
+        preg_match_all("(\.(?P<classes>-?[_a-zA-Z][_a-zA-Z0-9-]*))", $selectorString, $matches);
         return $matches['classes'];
     }
 
@@ -168,9 +163,9 @@ class CssChecker {
         foreach ($filteredCodeFiles as $codeFileName => $codeFileObject) {
             $fileContent = file_get_contents($codeFileName);
 
-			if($this->isVerbose){
-				print_r("Searching for classes in: " . $codeFileName . "\n");
-			}
+            if($this->isVerbose){
+                print_r("Searching for classes in: " . $codeFileName . "\n");
+            }
 
             //search this file for css classes
             foreach ($classes as $className => $counters) {
@@ -182,89 +177,5 @@ class CssChecker {
         }
 
         return $classes;
-    }
-}
-
-abstract class Check {
-
-    public function __construct($report, $config) {
-        $this->config = $config;
-        $this->report = $report;
-    }
-	
-	public function addWarning($entity, $message) {
-		$this->report->addWarning(get_class($this), $entity, $message);
-	}
-
-    abstract public function run($item);
-}
-
-abstract class SelectorCheck extends Check {}
-
-abstract class ClassCheck extends Check {}
-
-class Report {
-	
-	public function write($fp, $message) {
-		fwrite($fp, $message . PHP_EOL);
-		print_r($message . PHP_EOL);
-	}
-
-    public function printReport($start_time) {
-		// mark the stop time
-		$stop_time = microtime(true);
-
-		// get the difference in seconds
-		$time = $stop_time - $start_time;
-		
-		$fp = fopen(__DIR__ . "/../results.txt","wb");
-		
-		$this->write($fp, "\n");
-		$this->write($fp, "CSS check finished after " . number_format($time, 2)  . " seconds.");
-
-        foreach ($this->warnings as $check => $warnings) {
-			$this->write($fp, "\n");
-			$this->write($fp, $check);
-			$this->write($fp, "========================");
-			foreach($warnings as $warning) {
-				$this->write($fp, $warning['entity'] . ": " . $warning['message']);
-			}
-        }
-		
-		fclose($fp);
-    }
-
-    public function addWarning($check, $entity, $message) {
-        $warning = array(
-            'entity' => $entity,
-            'message' => $message
-        );
-        $this->warnings[$check][] = $warning;
-    }
-}
-
-class MultipleDefinitionsCheck extends ClassCheck {
-    public function run($class) {
-        if ($class['defCount'] > $this->config['maxDefinitions']) {
-            $this->addWarning($class['name'], 'Defined ' . $class['defCount'] . ', used ' . $class['useCount']);
-        }
-    }
-}
-
-class NoUsageCheck extends ClassCheck {
-    public function run($class) {
-        if ($class['useCount'] == 0) {
-            $this->addWarning($class['name'], 'Not used.');
-        }
-    }
-}
-
-class SelectorLengthCheck extends SelectorCheck {
-    public function run($selector) {
-        $selectorFragments = explode(" ", $selector['string']);
-
-        if (count($selectorFragments) > $this->config['maxSelectorLength']) {
-            $this->addWarning($selector['string'], 'Selector is over ' . $this->config['maxSelectorLength'] . ' levels deep.');
-        }
     }
 }

@@ -1,9 +1,10 @@
 #!/usr/bin/env php
-
 <?php
+namespace csschecker;
+
+use csschecker\reports\Report;
 
 require_once(__DIR__ . '/vendor/autoload.php');
-require_once(__DIR__ . '/src/classes.php');
 
 $checks = array(
     'MultipleDefinitionsCheck' => array(
