@@ -8,6 +8,14 @@
     "authors": [
         {"name": "fif"}
     ],
+    "autoload": {
+        "files": [
+            "autoload.php"
+        ]
+    },
+    "bin": [
+        "csschecker"
+    ],
     "require": {
         "php": ">=5.3.3",
 		"sabberworm/php-css-parser": "5.*"	

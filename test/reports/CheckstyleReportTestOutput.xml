@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle>
+    <file name=".bar">
+        <error message="Bar closed" severity="error" line="1" column="1" source="NoUsageCheck"/>
+    </file>
+    <file name=".foo">
+        <error message="Fooooooooo" severity="error" line="1" column="1" source="NoUsageCheck"/>
+    </file>
+    <file name=".foo .bar .baz .bobz">
+        <error message="Selector too deep" severity="error" line="1" column="1" source="SelectorLengthCheck"/>
+    </file>
+</checkstyle>
