@@ -1,11 +1,13 @@
 <?php
 
-require_once(__DIR__ . '/../src/classes.php');
+namespace csschecker;
 
-class CSSCheckerTest extends PHPUnit_Framework_TestCase{
+class CSSCheckerTest extends \PHPUnit_Framework_TestCase{
+
+    private $checker;
 
     public function testGetClassesInSelectorString() {
-		$this->checker = new CssChecker;
+		$this->checker = new CssChecker();
 		
 		$t1 = $this->checker->getClassesInSelectorString('.hello .world');
         $this->assertEquals(array('hello','world'), $t1);
