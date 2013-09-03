@@ -1,27 +1,27 @@
 .used-class {
-background: black;
+    background: black;
 }
 
 .used-class-extra {
-background: black;
+    background: black;
 }
 
 .defined-once-used-once {
-background: black;
+    background: black;
 }
 
 .not-used-class {
-background: black;
+    background: black;
 }
 
 .nesting .five .levels .deep .used-class {
-background: black;
+    background: black;
 }
 
 .nesting .five .levels .deep .not-used-class {
-background: black;
+    background: black;
 }
 
 .action-dislike {
-display:block;
+    display: block;
 }
