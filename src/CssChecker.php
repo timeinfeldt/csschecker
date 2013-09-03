@@ -1,6 +1,8 @@
 <?php
 namespace csschecker;
 
+use csschecker\reports\Report;
+
 class CssChecker {
 
     private $selectors = array();
@@ -8,7 +10,7 @@ class CssChecker {
     private $isVerbose = false;
 
     public function runChecks($options, $checksConfig, Report $report) {
-        $start_time = microtime(true);
+        $report->setStartTime(microtime(true));
 
         $paths = array();
 
@@ -38,15 +40,14 @@ class CssChecker {
 
         foreach ($checksConfig as $checkName => $config) {
 
+            $checkName = '\\csschecker\\checks\\' . $checkName;
             $check = new $checkName($report, $config);
 
-            if ($check instanceof SelectorCheck) {
-
+            if ($check instanceof \csschecker\checks\SelectorCheck) {
                 foreach ($selectors as $selector) {
-
                     $check->run($selector);
                 }
-            } else if ($check instanceof ClassCheck) {
+            } else if ($check instanceof \csschecker\checks\ClassCheck) {
                 foreach ($classes as $class) {
                     $check->run($class);
                 }
@@ -54,14 +55,13 @@ class CssChecker {
                 die('dafuq');
             }
         }
-
-        $report->printReport($start_time);
+        $report->generateReport();
     }
 
     public function getFilesInPath($realpath, $match_regex) {
         $path = realpath($realpath);
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
-        $filteredFiles = new RegexIterator($files, $match_regex, \RecursiveRegexIterator::GET_MATCH);
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
+        $filteredFiles = new \RegexIterator($files, $match_regex, \RecursiveRegexIterator::GET_MATCH);
         return $filteredFiles;
     }
 
@@ -85,8 +85,8 @@ class CssChecker {
                 print_r("Collecting CSS selectors from: " . $cssFileName . "\n");
             }
 
-            $oSettings = Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
-            $oCssParser = new Sabberworm\CSS\Parser(file_get_contents($cssFileName), $oSettings);
+            $oSettings = \Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
+            $oCssParser = new \Sabberworm\CSS\Parser(file_get_contents($cssFileName), $oSettings);
             $oCss = $oCssParser->parse();
 
             foreach ($oCss->getAllDeclarationBlocks() as $oBlock) {
