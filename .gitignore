@@ -1,4 +1,5 @@
 .DS_Store
 vendor
-results.txt
+result.txt
+checkstyle.xml
 .idea

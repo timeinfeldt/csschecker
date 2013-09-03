@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
-namespace csschecker;
 
+use csschecker\CssChecker;
 use csschecker\reports\CheckstyleReport;
 use csschecker\reports\CompositeReport;
 use csschecker\reports\FileReport;
@@ -24,9 +24,10 @@ unset($args[0]);
 
 $checker = new CssChecker;
 $report = new CompositeReport(array(
-    new FileReport(fopen('r', 'php://stdout')),
-    new FileReport(fopen('r', __DIR__ . '/result.txt')),
+    new FileReport(fopen('php://stdout', 'w')),
+    new FileReport(fopen(__DIR__ . '/result.txt', 'w')),
     new CheckstyleReport(__DIR__ . '/checkstyle.xml')
 ));
 
 $checker->runChecks($args, $checks, $report);
+
