@@ -7,7 +7,13 @@
         verbose="true">
     <testsuites>
         <testsuite name="unit">
-            <directory suffix="Test.php">test</directory>
+            <directory suffix="Test.php">test/unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory suffix="Test.php">test/integration</directory>
+        </testsuite>
+         <testsuite name="system">
+             <directory suffix=".phpt">test/system</directory>
         </testsuite>
     </testsuites>
 </phpunit>
