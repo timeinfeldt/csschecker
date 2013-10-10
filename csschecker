@@ -16,7 +16,8 @@ $checks = array(
     'SelectorLengthCheck' => array(
         'maxSelectorLength' => 4
     ),
-    'NoUsageCheck' => array()
+    'NoUsageCheck' => array(),
+    'RuleUsageCheck' => array()
 );
 
 $args = $_SERVER['argv'];

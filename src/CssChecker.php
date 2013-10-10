@@ -7,6 +7,8 @@ class CssChecker {
 
     private $selectors = array();
 
+    private $rules = array();
+
     private $isVerbose = false;
 
     public function runChecks($options, $checksConfig, Report $report) {
@@ -38,6 +40,8 @@ class CssChecker {
 
         $classes = $this->getClassUsageInDirectory($codeDirectoryPath, $cssDirectoryPath);
 
+        $rules = $this->getRulesInDirectory($cssDirectoryPath);
+
         foreach ($checksConfig as $checkName => $config) {
 
             $checkName = '\\csschecker\\checks\\' . $checkName;
@@ -50,6 +54,10 @@ class CssChecker {
             } else if ($check instanceof \csschecker\checks\ClassCheck) {
                 foreach ($classes as $class) {
                     $check->run($class);
+                }
+            } else if ($check instanceof \csschecker\checks\RuleCheck) {
+                foreach ($rules as $rule) {
+                    $check->run($rule);
                 }
             } else {
                 die('dafuq');
@@ -65,8 +73,19 @@ class CssChecker {
         return $filteredFiles;
     }
 
-    public function getSelectorsInDirectory($path) {
+    public function parseCSSFile($cssFileName) {
+        if ($this->isVerbose) {
+            print_r("Parsing: " . $cssFileName . "\n");
+        }
 
+        $oSettings = \Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
+        $oCssParser = new \Sabberworm\CSS\Parser(file_get_contents($cssFileName), $oSettings);
+        $oCss = $oCssParser->parse();
+
+        return $oCss;
+    }
+
+    public function getSelectorsInDirectory($path) {
         if (count($this->selectors) > 0) {
             return $this->selectors;
         }
@@ -81,22 +100,14 @@ class CssChecker {
 
         foreach ($cssFiles as $cssFileName => $cssFileObject) {
 
-            if($this->isVerbose){
-                print_r("Collecting CSS selectors from: " . $cssFileName . "\n");
-            }
-
-            $oSettings = \Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
-            $oCssParser = new \Sabberworm\CSS\Parser(file_get_contents($cssFileName), $oSettings);
-            $oCss = $oCssParser->parse();
+            $oCss = $this->parseCSSFile($cssFileName);
 
             foreach ($oCss->getAllDeclarationBlocks() as $oBlock) {
                 foreach ($oBlock->getSelectors() as $oSelector) {
-                    $selector = $oSelector->getSelector();
-                    $selector = array(
-                        'string' => $selector,
+                    $selectors[] = array(
+                        'string' => $oSelector->getSelector(),
                         'defLocation' => $cssFileName
                     );
-                    $selectors[] = $selector;
                 }
             }
         }
@@ -106,10 +117,56 @@ class CssChecker {
         return $selectors;
     }
 
+    public function getRulesInDirectory($path) {
+        if (count($this->rules) > 0) {
+            return $this->rules;
+        }
+
+        $rules = array();
+
+        //get all CSS files
+        $cssFiles = $this->getFilesInPath(
+            $path,
+            '(\.(css)$)i'
+        );
+
+        foreach ($cssFiles as $cssFileName => $cssFileObject) {
+
+            $oCss = $this->parseCSSFile($cssFileName);
+
+            foreach ($oCss->getAllDeclarationBlocks() as $oBlock) {
+
+                foreach ($oBlock->getRules() as $oRule) {
+                    $rule = $oRule->getRule();
+                    $val = $oRule->getValue();
+
+                    if (isset($rules[$rule])) {
+                        $rules[$rule]['defCount'] += 1;
+                        if (isset($rules[$rule]['values'][$val])) {
+                            $rules[$rule]['values'][$val]['defCount'] += 1;
+                        } else {
+                            $rules[$rule]['values'][$val]['name'] = $rule['mValue'];
+                            $rules[$rule]['values'][$val]['defCount'] = 1;
+                        }
+                    } else {
+                        $rules[$rule]['name'] = $rule;
+                        $rules[$rule]['defCount'] = 1;
+                        $rules[$rule]['values'][$val]['name'] = $val;
+                        $rules[$rule]['values'][$val]['defCount'] = 1;
+                    }
+                }
+            }
+        }
+
+        $this->rules = $rules;
+
+        return $rules;
+    }
+
     public function getClassesInDirectory($cssDirectoryPath) {
 
         $selectors = $this->getSelectorsInDirectory($cssDirectoryPath);
-
+        $this->getRulesInDirectory($cssDirectoryPath);
         $classes = array();
 
         foreach ($selectors as $selector) {
@@ -134,7 +191,7 @@ class CssChecker {
         $classNames = $this->getClassesInSelectorString($selector['string']);
         $classes = array();
 
-        foreach($classNames as $className) {
+        foreach ($classNames as $className) {
             $classes[] = array(
                 'name' => $className,
                 'defLocation' => $selector['defLocation']
@@ -163,7 +220,7 @@ class CssChecker {
         foreach ($filteredCodeFiles as $codeFileName => $codeFileObject) {
             $fileContent = file_get_contents($codeFileName);
 
-            if($this->isVerbose){
+            if ($this->isVerbose) {
                 print_r("Searching for classes in: " . $codeFileName . "\n");
             }
 
