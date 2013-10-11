@@ -11,13 +11,13 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 $checks = array(
     'MultipleDefinitionsCheck' => array(
-        'maxDefinitions' => 1
+        'maxDefinitions' => 10
     ),
     'SelectorLengthCheck' => array(
-        'maxSelectorLength' => 4
+        'maxSelectorLength' => 5
     ),
     'NoUsageCheck' => array(),
-    'RuleUsageCheck' => array()
+    //'RuleUsageCheck' => array()
 );
 
 $args = $_SERVER['argv'];
