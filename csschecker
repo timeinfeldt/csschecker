@@ -11,7 +11,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 $checks = array(
     'MultipleDefinitionsCheck' => array(
-        'maxDefinitions' => 2
+        'maxDefinitions' => 1
     ),
     'SelectorLengthCheck' => array(
         'maxSelectorLength' => 4

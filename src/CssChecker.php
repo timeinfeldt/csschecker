@@ -36,11 +36,9 @@ class CssChecker {
         list($codeDirectoryPath, $cssDirectoryPath) = $paths;
 
         //gather required data
-        $selectors = $this->getSelectorsInDirectory($cssDirectoryPath);
+        $this->parseDeclarations($cssDirectoryPath);
 
-        $classes = $this->getClassUsageInDirectory($codeDirectoryPath, $cssDirectoryPath);
-
-        $rules = $this->getRulesInDirectory($cssDirectoryPath);
+        $classes = $this->getClassUsage($codeDirectoryPath, $cssDirectoryPath);
 
         foreach ($checksConfig as $checkName => $config) {
 
@@ -48,7 +46,7 @@ class CssChecker {
             $check = new $checkName($report, $config);
 
             if ($check instanceof \csschecker\checks\SelectorCheck) {
-                foreach ($selectors as $selector) {
+                foreach ($this->selectors as $selector) {
                     $check->run($selector);
                 }
             } else if ($check instanceof \csschecker\checks\ClassCheck) {
@@ -56,7 +54,7 @@ class CssChecker {
                     $check->run($class);
                 }
             } else if ($check instanceof \csschecker\checks\RuleCheck) {
-                foreach ($rules as $rule) {
+                foreach ($this->rules as $rule) {
                     $check->run($rule);
                 }
             } else {
@@ -85,12 +83,11 @@ class CssChecker {
         return $oCss;
     }
 
-    public function getSelectorsInDirectory($path) {
-        if (count($this->selectors) > 0) {
-            return $this->selectors;
-        }
+    public function parseDeclarations($path) {
 
         $selectors = array();
+
+        $rules = array();
 
         //get all CSS files
         $cssFiles = $this->getFilesInPath(
@@ -109,43 +106,17 @@ class CssChecker {
                         'defLocation' => $cssFileName
                     );
                 }
-            }
-        }
-
-        $this->selectors = $selectors;
-
-        return $selectors;
-    }
-
-    public function getRulesInDirectory($path) {
-        if (count($this->rules) > 0) {
-            return $this->rules;
-        }
-
-        $rules = array();
-
-        //get all CSS files
-        $cssFiles = $this->getFilesInPath(
-            $path,
-            '(\.(css)$)i'
-        );
-
-        foreach ($cssFiles as $cssFileName => $cssFileObject) {
-
-            $oCss = $this->parseCSSFile($cssFileName);
-
-            foreach ($oCss->getAllDeclarationBlocks() as $oBlock) {
 
                 foreach ($oBlock->getRules() as $oRule) {
                     $rule = $oRule->getRule();
-                    $val = $oRule->getValue();
+                    $val = (string) $oRule->getValue();
 
                     if (isset($rules[$rule])) {
                         $rules[$rule]['defCount'] += 1;
                         if (isset($rules[$rule]['values'][$val])) {
                             $rules[$rule]['values'][$val]['defCount'] += 1;
                         } else {
-                            $rules[$rule]['values'][$val]['name'] = $rule['mValue'];
+                            $rules[$rule]['values'][$val]['name'] = $val;
                             $rules[$rule]['values'][$val]['defCount'] = 1;
                         }
                     } else {
@@ -158,18 +129,15 @@ class CssChecker {
             }
         }
 
+        $this->selectors = $selectors;
         $this->rules = $rules;
-
-        return $rules;
     }
 
-    public function getClassesInDirectory($cssDirectoryPath) {
+    public function getClasses() {
 
-        $selectors = $this->getSelectorsInDirectory($cssDirectoryPath);
-        $this->getRulesInDirectory($cssDirectoryPath);
         $classes = array();
 
-        foreach ($selectors as $selector) {
+        foreach ($this->selectors as $selector) {
 
             $classesInSelector = $this->getClassesInSelector($selector);
             foreach ($classesInSelector as $class) {
@@ -207,8 +175,8 @@ class CssChecker {
         return $matches['classes'];
     }
 
-    public function getClassUsageInDirectory($codeDirectoryPath, $cssDirectoryPath) {
-        $classes = $this->getClassesInDirectory($cssDirectoryPath);
+    public function getClassUsage($codeDirectoryPath) {
+        $classes = $this->getClasses();
 
         //get all code files
         $filteredCodeFiles = $this->getFilesInPath(
