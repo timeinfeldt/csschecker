@@ -4,7 +4,7 @@
     "description" : "Checks CSS for potential optimizations",
     "keywords" : ["css", "optimization", "cli"],
     "homepage" : "https://github.com/timeinfeldt/csschecker",
-    "license" : "GPL v3",
+    "license" : "MIT",
     "authors" : [
         {
             "name" : "Tim Einfeldt"
