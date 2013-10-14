@@ -7,7 +7,17 @@ use csschecker\reports\CompositeReport;
 use csschecker\reports\FileReport;
 use csschecker\reports\Report;
 
-require_once(__DIR__ . '/vendor/autoload.php');
+// dev & installed autoloading
+$files = array(
+    __DIR__ . '/vendor/autoload.php',
+    __DIR__ . '/autoload.php'
+);
+foreach ($files as $file) {
+    if (file_exists($file)) {
+        require $file;
+        break;
+    }   
+}
 
 $checks = array(
     'MultipleDefinitionsCheck' => array(
