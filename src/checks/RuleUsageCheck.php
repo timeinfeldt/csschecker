@@ -20,7 +20,7 @@ class RuleUsageCheck extends RuleCheck {
 
             $message = 'Defined ' . $rule['defCount'] . ' times with ' . count($rule['values']) . ' values: ' . PHP_EOL;
             foreach($rule['values'] as $value) {
-                $message .= "\t" . $value['name'] . " (" . $value['defCount'] . ")" . PHP_EOL;
+                $message .= " > " . $value['name'] . " (" . $value['defCount'] . ")" . PHP_EOL;
             }
             $this->addWarning($rule['name'], $message);
         }

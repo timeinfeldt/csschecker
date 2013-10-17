@@ -9,6 +9,8 @@ class CssChecker {
 
     private $rules = array();
 
+    private $cssFiles = array();
+
     private $isVerbose = false;
 
     public function runChecks($options, $checksConfig, Report $report) {
@@ -57,6 +59,10 @@ class CssChecker {
                 foreach ($this->rules as $rule) {
                     $check->run($rule);
                 }
+            } else if ($check instanceof \csschecker\checks\CssFileCheck) {
+                foreach ($this->cssFiles as $file) {
+                    $check->run($file);
+                }
             } else {
                 die('dafuq');
             }
@@ -89,6 +95,8 @@ class CssChecker {
 
         $rules = array();
 
+        $files = array();
+
         //get all CSS files
         $cssFiles = $this->getFilesInPath(
             $path,
@@ -99,7 +107,9 @@ class CssChecker {
 
             $oCss = $this->parseCSSFile($cssFileName);
 
-            foreach ($oCss->getAllDeclarationBlocks() as $oBlock) {
+            $declarations = $oCss->getAllDeclarationBlocks();
+
+            foreach ($declarations as $oBlock) {
                 foreach ($oBlock->getSelectors() as $oSelector) {
                     $selectors[] = array(
                         'string' => $oSelector->getSelector(),
@@ -127,8 +137,15 @@ class CssChecker {
                     }
                 }
             }
+
+            $files[] = array(
+                'name' => $cssFileName,
+                'declarationsCount' => count($declarations)
+            );
+
         }
 
+        $this->cssFiles = $files;
         $this->selectors = $selectors;
         $this->rules = $rules;
     }
