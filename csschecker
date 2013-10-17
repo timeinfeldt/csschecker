@@ -20,9 +20,11 @@ foreach ($files as $file) {
 }
 
 $checks = array(
+    /*
     'MultipleDefinitionsCheck' => array(
         'maxDefinitions' => 10
     ),
+    */
     'SelectorLengthCheck' => array(
         'maxSelectorLength' => 5
     ),
