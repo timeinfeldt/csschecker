@@ -28,12 +28,12 @@ $checks = array(
     'SelectorLengthCheck' => array(
         'maxSelectorLength' => 5
     ),
-    'NoUsageCheck' => array(),
+    //'NoUsageCheck' => array(),
     'RuleUsageCheck' => array(),
     'FileDeclarationsCountCheck' => array(),
     'FileSizeCheck' => array(),
     'ClassLengthCheck' => array(
-        'maxClassLength' => 30
+        'maxClassLength' => 40
     )
 );
 

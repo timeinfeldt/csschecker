@@ -7,8 +7,8 @@ class RuleUsageCheck extends RuleCheck {
         'color',
         'line-height',
         'font-size',
-        'padding',
-        'margin'
+        //'padding',
+        //'margin'
     );
 
     public function run($rule) {
