@@ -19,24 +19,6 @@ foreach ($files as $file) {
     }
 }
 
-$checks = array(
-    /*
-    'MultipleDefinitionsCheck' => array(
-        'maxDefinitions' => 10
-    ),
-    */
-    'SelectorLengthCheck' => array(
-        'maxSelectorLength' => 4
-    ),
-    //'NoUsageCheck' => array(),
-    'RuleUsageCheck' => array(),
-    //'FileDeclarationsCountCheck' => array(),
-    //'FileSizeCheck' => array(),
-    'ClassLengthCheck' => array(
-        'maxClassLength' => 40
-    )
-);
-
 $args = $_SERVER['argv'];
 unset($args[0]);
 

@@ -1,0 +1,13 @@
+{
+    'MultipleDefinitionsCheck' : {
+        'maxDefinitions' : 10
+    },
+    'SelectorLengthCheck' : {
+        'maxSelectorLength' : 4
+    },
+    'RuleUsageCheck' : {},
+    'NoUsageCheck' : {},
+    'ClassLengthCheck' : {
+        'maxClassLength' : 40
+    }
+}

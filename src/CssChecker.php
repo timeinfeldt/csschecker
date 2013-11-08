@@ -226,11 +226,14 @@ class CssChecker {
     }
 
     private function loadConfig() {
-        if ($this->config && file_exists($this->config)) {
-            return $this->parseConfigFile($this->config);
-        }
-        if ($this->config && file_exists(getcwd() . '/' . $this->config)) {
-            return $this->parseConfigFile(getcwd() . '/' . $this->config);
+        if ($this->config) {
+            if (file_exists($this->config)) {
+                return $this->parseConfigFile($this->config);
+            }
+            if ($this->config && file_exists(getcwd() . '/' . $this->config)) {
+                return $this->parseConfigFile(getcwd() . '/' . $this->config);
+            }
+            throw new \Exception('Config file: "' . $this->config . '" not found.');
         }
         $defaultConfigPath = getcwd() . '/csschecker.json';
         if (file_exists($defaultConfigPath)) {
