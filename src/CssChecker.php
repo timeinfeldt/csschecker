@@ -9,7 +9,9 @@ class CssChecker {
 
     private $isVerbose = false;
 
-    public function runChecks($options, $checksConfig, Report $report) {
+    private $config;
+
+    public function runChecks($options, Report $report) {
         $report->setStartTime(microtime(true));
 
         $paths = array();
@@ -19,8 +21,8 @@ class CssChecker {
                 case '--verbose':
                     $this->isVerbose = true;
                     break;
-                case '--something':
-                    $arg = array_shift($options);
+                case '--config':
+                    $this->config = array_shift($options);
                     break;
                 default:
                     $paths[] = $arg;
@@ -37,6 +39,8 @@ class CssChecker {
         $selectors = $this->getSelectorsInDirectory($cssDirectoryPath);
 
         $classes = $this->getClassUsageInDirectory($codeDirectoryPath, $cssDirectoryPath);
+
+        $checksConfig = $this->loadConfig();
 
         foreach ($checksConfig as $checkName => $config) {
 
@@ -66,7 +70,6 @@ class CssChecker {
     }
 
     public function getSelectorsInDirectory($path) {
-
         if (count($this->selectors) > 0) {
             return $this->selectors;
         }
@@ -80,8 +83,7 @@ class CssChecker {
         );
 
         foreach ($cssFiles as $cssFileName => $cssFileObject) {
-
-            if($this->isVerbose){
+            if($this->isVerbose) {
                 print_r("Collecting CSS selectors from: " . $cssFileName . "\n");
             }
 
@@ -107,7 +109,6 @@ class CssChecker {
     }
 
     public function getClassesInDirectory($cssDirectoryPath) {
-
         $selectors = $this->getSelectorsInDirectory($cssDirectoryPath);
 
         $classes = array();
@@ -178,4 +179,32 @@ class CssChecker {
 
         return $classes;
     }
+
+    private function loadConfig() {
+
+        if ($this->config && file_exists($this->config)) {
+            return $this->parseConfigFile($this->config);
+        }
+        if ($this->config && file_exists(getcwd() . '/' . $this->config)) {
+            return $this->parseConfigFile(getcwd() . '/' . $this->config);
+        }
+        $defaultConfigPath = getcwd() . '/csschecker.json';
+        if (file_exists($defaultConfigPath)) {
+            return $this->parseConfigFile($defaultConfigPath);
+        }
+        return $this->parseConfigFile(__DIR__ . '/../default-config.json');
+    }
+
+    private function parseConfigFile($configFilePath) {
+        $configFile = file_get_contents($configFilePath);
+        if (!$configFile) {
+            throw new \Exception('Config file ' . $configFilePath . ' could not be read.');
+        }
+        $config = json_decode($configFile);
+        if ($config === null) {
+            throw new \Exception('Json could not be parsed');
+        }
+        return $config;
+    }
+
 }

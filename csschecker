@@ -7,17 +7,7 @@ use csschecker\reports\CompositeReport;
 use csschecker\reports\FileReport;
 use csschecker\reports\Report;
 
-require_once(__DIR__ . '/vendor/autoload.php');
-
-$checks = array(
-    'MultipleDefinitionsCheck' => array(
-        'maxDefinitions' => 2
-    ),
-    'SelectorLengthCheck' => array(
-        'maxSelectorLength' => 4
-    ),
-    'NoUsageCheck' => array()
-);
+require_once __DIR__ . '/vendor/autoload.php';
 
 $args = $_SERVER['argv'];
 unset($args[0]);
@@ -29,5 +19,4 @@ $report = new CompositeReport(array(
     new CheckstyleReport(__DIR__ . '/checkstyle.xml')
 ));
 
-$checker->runChecks($args, $checks, $report);
-
+$checker->runChecks($args, $report);
