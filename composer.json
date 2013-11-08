@@ -1,13 +1,16 @@
 {
-    "name" : "ololrofler/csschecker",
-    "type" : "cli mopped",
-    "description" : "Chex yo CESSS",
-    "keywords" : ["css", "checker", "cli"],
-    "homepage" : "1337h4x0rz.org",
+    "name" : "timeinfeldt/csschecker",
+    "type" : "CLI",
+    "description" : "Checks CSS for potential optimizations",
+    "keywords" : ["css", "optimization", "cli"],
+    "homepage" : "https://github.com/timeinfeldt/csschecker",
     "license" : "MIT",
     "authors" : [
         {
-            "name" : "fif"
+            "name" : "Tim Einfeldt"
+        },
+        {
+            "name" : "Volker Dusch"
         }
     ],
     "autoload" : {

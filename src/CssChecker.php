@@ -7,6 +7,10 @@ class CssChecker {
 
     private $selectors = array();
 
+    private $rules = array();
+
+    private $cssFiles = array();
+
     private $isVerbose = false;
 
     private $config;
@@ -36,9 +40,9 @@ class CssChecker {
         list($codeDirectoryPath, $cssDirectoryPath) = $paths;
 
         //gather required data
-        $selectors = $this->getSelectorsInDirectory($cssDirectoryPath);
+        $this->parseDeclarations($cssDirectoryPath);
 
-        $classes = $this->getClassUsageInDirectory($codeDirectoryPath, $cssDirectoryPath);
+        $classes = $this->getClassUsage($codeDirectoryPath, $cssDirectoryPath);
 
         $checksConfig = $this->loadConfig();
 
@@ -48,12 +52,20 @@ class CssChecker {
             $check = new $checkName($report, $config);
 
             if ($check instanceof \csschecker\checks\SelectorCheck) {
-                foreach ($selectors as $selector) {
+                foreach ($this->selectors as $selector) {
                     $check->run($selector);
                 }
             } else if ($check instanceof \csschecker\checks\ClassCheck) {
                 foreach ($classes as $class) {
                     $check->run($class);
+                }
+            } else if ($check instanceof \csschecker\checks\RuleCheck) {
+                foreach ($this->rules as $rule) {
+                    $check->run($rule);
+                }
+            } else if ($check instanceof \csschecker\checks\CssFileCheck) {
+                foreach ($this->cssFiles as $file) {
+                    $check->run($file);
                 }
             } else {
                 die('dafuq');
@@ -69,12 +81,25 @@ class CssChecker {
         return $filteredFiles;
     }
 
-    public function getSelectorsInDirectory($path) {
-        if (count($this->selectors) > 0) {
-            return $this->selectors;
+    public function parseCSSFile($cssFileName) {
+        if ($this->isVerbose) {
+            print_r("Parsing: " . $cssFileName . "\n");
         }
 
+        $oSettings = \Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
+        $oCssParser = new \Sabberworm\CSS\Parser(file_get_contents($cssFileName), $oSettings);
+        $oCss = $oCssParser->parse();
+
+        return $oCss;
+    }
+
+    public function parseDeclarations($path) {
+
         $selectors = array();
+
+        $rules = array();
+
+        $files = array();
 
         //get all CSS files
         $cssFiles = $this->getFilesInPath(
@@ -83,37 +108,57 @@ class CssChecker {
         );
 
         foreach ($cssFiles as $cssFileName => $cssFileObject) {
-            if($this->isVerbose) {
-                print_r("Collecting CSS selectors from: " . $cssFileName . "\n");
-            }
 
-            $oSettings = \Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
-            $oCssParser = new \Sabberworm\CSS\Parser(file_get_contents($cssFileName), $oSettings);
-            $oCss = $oCssParser->parse();
+            $oCss = $this->parseCSSFile($cssFileName);
 
-            foreach ($oCss->getAllDeclarationBlocks() as $oBlock) {
+            $declarations = $oCss->getAllDeclarationBlocks();
+
+            foreach ($declarations as $oBlock) {
                 foreach ($oBlock->getSelectors() as $oSelector) {
-                    $selector = $oSelector->getSelector();
-                    $selector = array(
-                        'string' => $selector,
+                    $selectors[] = array(
+                        'string' => $oSelector->getSelector(),
                         'defLocation' => $cssFileName
                     );
-                    $selectors[] = $selector;
+                }
+
+                foreach ($oBlock->getRules() as $oRule) {
+                    $rule = $oRule->getRule();
+                    $val = (string) $oRule->getValue();
+
+                    if (isset($rules[$rule])) {
+                        $rules[$rule]['defCount'] += 1;
+                        if (isset($rules[$rule]['values'][$val])) {
+                            $rules[$rule]['values'][$val]['defCount'] += 1;
+                        } else {
+                            $rules[$rule]['values'][$val]['name'] = $val;
+                            $rules[$rule]['values'][$val]['defCount'] = 1;
+                        }
+                    } else {
+                        $rules[$rule]['name'] = $rule;
+                        $rules[$rule]['defCount'] = 1;
+                        $rules[$rule]['values'][$val]['name'] = $val;
+                        $rules[$rule]['values'][$val]['defCount'] = 1;
+                    }
                 }
             }
+
+            $files[] = array(
+                'name' => $cssFileName,
+                'declarationsCount' => count($declarations)
+            );
+
         }
 
+        $this->cssFiles = $files;
         $this->selectors = $selectors;
-
-        return $selectors;
+        $this->rules = $rules;
     }
 
-    public function getClassesInDirectory($cssDirectoryPath) {
-        $selectors = $this->getSelectorsInDirectory($cssDirectoryPath);
+    public function getClasses() {
 
         $classes = array();
 
-        foreach ($selectors as $selector) {
+        foreach ($this->selectors as $selector) {
 
             $classesInSelector = $this->getClassesInSelector($selector);
             foreach ($classesInSelector as $class) {
@@ -135,7 +180,7 @@ class CssChecker {
         $classNames = $this->getClassesInSelectorString($selector['string']);
         $classes = array();
 
-        foreach($classNames as $className) {
+        foreach ($classNames as $className) {
             $classes[] = array(
                 'name' => $className,
                 'defLocation' => $selector['defLocation']
@@ -151,8 +196,8 @@ class CssChecker {
         return $matches['classes'];
     }
 
-    public function getClassUsageInDirectory($codeDirectoryPath, $cssDirectoryPath) {
-        $classes = $this->getClassesInDirectory($cssDirectoryPath);
+    public function getClassUsage($codeDirectoryPath) {
+        $classes = $this->getClasses();
 
         //get all code files
         $filteredCodeFiles = $this->getFilesInPath(
@@ -164,7 +209,7 @@ class CssChecker {
         foreach ($filteredCodeFiles as $codeFileName => $codeFileObject) {
             $fileContent = file_get_contents($codeFileName);
 
-            if($this->isVerbose){
+            if ($this->isVerbose) {
                 print_r("Searching for classes in: " . $codeFileName . "\n");
             }
 
@@ -181,7 +226,6 @@ class CssChecker {
     }
 
     private function loadConfig() {
-
         if ($this->config && file_exists($this->config)) {
             return $this->parseConfigFile($this->config);
         }

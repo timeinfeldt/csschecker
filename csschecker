@@ -7,7 +7,35 @@ use csschecker\reports\CompositeReport;
 use csschecker\reports\FileReport;
 use csschecker\reports\Report;
 
-require_once __DIR__ . '/vendor/autoload.php';
+// dev & installed autoloading
+$files = array(
+    __DIR__ . '/vendor/autoload.php',
+    __DIR__ . '/../../autoload.php'
+);
+foreach ($files as $file) {
+    if (file_exists($file)) {
+        require $file;
+        break;
+    }
+}
+
+$checks = array(
+    /*
+    'MultipleDefinitionsCheck' => array(
+        'maxDefinitions' => 10
+    ),
+    */
+    'SelectorLengthCheck' => array(
+        'maxSelectorLength' => 4
+    ),
+    //'NoUsageCheck' => array(),
+    'RuleUsageCheck' => array(),
+    //'FileDeclarationsCountCheck' => array(),
+    //'FileSizeCheck' => array(),
+    'ClassLengthCheck' => array(
+        'maxClassLength' => 40
+    )
+);
 
 $args = $_SERVER['argv'];
 unset($args[0]);
