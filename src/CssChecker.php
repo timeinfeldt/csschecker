@@ -5,6 +5,15 @@ use csschecker\reports\Report;
 
 class CssChecker {
 
+    const RETURN_CODE_ERROR = 1;
+    const RETURN_CODE_INVALID_CLI_ARGUMENTS = 3;
+
+    private $config;
+
+    private $codeDirs = array();
+
+    private $cssDirs = array();
+
     private $selectors = array();
 
     private $rules = array();
@@ -13,7 +22,14 @@ class CssChecker {
 
     private $isVerbose = false;
 
-    private $config;
+    public function run($options, Report $report) {
+        try {
+            $this->runChecks($options, $report);
+        } catch (\Exception $e) {
+            echo "Error: " . $e->getMessage();
+            die(self::RETURN_CODE_ERROR);
+        }
+    }
 
     public function runChecks($options, Report $report) {
         $report->setStartTime(microtime(true));
@@ -28,21 +44,30 @@ class CssChecker {
                 case '--config':
                     $this->config = array_shift($options);
                     break;
+                case '--additionalCodeDir':
+                    $this->codeDirs[] = array_shift($options);
+                    break;
+                case '--additionalCssDir':
+                    $this->cssDirs[] = array_shift($options);
+                    break;
                 default:
                     $paths[] = $arg;
             }
         }
 
         if (count($paths) != 2) {
-            die('You dont even know how to cli?');
+            $this->printUsage('Invalid CLI arguments. Please provide a code directory and a css directory.');
+            die(self::RETURN_CODE_INVALID_CLI_ARGUMENTS);
         }
 
         list($codeDirectoryPath, $cssDirectoryPath) = $paths;
+        $this->codeDirs[] = $codeDirectoryPath;
+        $this->cssDirs[] = $cssDirectoryPath;
 
         //gather required data
-        $this->parseDeclarations($cssDirectoryPath);
+        $this->parseDeclarations();
 
-        $classes = $this->getClassUsage($codeDirectoryPath, $cssDirectoryPath);
+        $classes = $this->getClassUsage();
 
         $checksConfig = $this->loadConfig();
 
@@ -68,16 +93,19 @@ class CssChecker {
                     $check->run($file);
                 }
             } else {
-                die('dafuq');
+                throw new \Exception('Unexpected check ' . get_class($check));
             }
         }
         $report->generateReport();
     }
 
-    public function getFilesInPath($realpath, $match_regex) {
-        $path = realpath($realpath);
-        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
-        $filteredFiles = new \RegexIterator($files, $match_regex, \RecursiveRegexIterator::GET_MATCH);
+    public function getFilesInPath($pathes, $match_regex) {
+        $filteredFiles = new \AppendIterator();
+        foreach ($pathes as $path) {
+            $path = realpath($path);
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
+            $filteredFiles->append(new \RegexIterator($files, $match_regex, \RecursiveRegexIterator::GET_MATCH));
+        }
         return $filteredFiles;
     }
 
@@ -93,17 +121,14 @@ class CssChecker {
         return $oCss;
     }
 
-    public function parseDeclarations($path) {
-
+    public function parseDeclarations() {
         $selectors = array();
-
         $rules = array();
-
         $files = array();
 
         //get all CSS files
         $cssFiles = $this->getFilesInPath(
-            $path,
+            $this->cssDirs,
             '(\.(css)$)i'
         );
 
@@ -196,12 +221,12 @@ class CssChecker {
         return $matches['classes'];
     }
 
-    public function getClassUsage($codeDirectoryPath) {
+    public function getClassUsage() {
         $classes = $this->getClasses();
 
         //get all code files
         $filteredCodeFiles = $this->getFilesInPath(
-            $codeDirectoryPath,
+            $this->codeDirs,
             '(\.(js|php|html)$)i'
         );
 
@@ -252,6 +277,25 @@ class CssChecker {
             throw new \Exception('Json could not be parsed');
         }
         return $config;
+    }
+
+    private function printUsage() {
+        echo <<<USAGE
+Usage: csschecker [options]... codeDirectory cssDirectory
+
+Example: csschecker --verbose --config myProject/myRules.json myProject/source/ myProject/web/css
+
+Options:
+    --config                Relative or absolute path to a ruleset.json file
+    --verbose               Enable verbose output
+
+    Providing multiple code or source folders:
+
+    --additionalCodeDir     Additional source code folder to scan. Option can be used multiple times
+    --additionalCssDir      Additional css code folder to scan. Option can be used multiple times
+
+USAGE;
+
     }
 
 }

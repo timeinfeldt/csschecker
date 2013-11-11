@@ -29,4 +29,4 @@ $report = new CompositeReport(array(
     new CheckstyleReport(__DIR__ . '/checkstyle.xml')
 ));
 
-$checker->runChecks($args, $report);
+$checker->run($args, $report);
