@@ -202,7 +202,7 @@ class CssChecker {
     }
 
     public function getClassesInSelector($selector) {
-        $classNames = $this->getClassesInSelectorString($selector['string']);
+        $classNames = Helpers::getClassesInSelectorString($selector['string']);
         $classes = array();
 
         foreach ($classNames as $className) {

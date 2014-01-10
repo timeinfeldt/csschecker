@@ -1,10 +1,11 @@
 <?php
 namespace csschecker\checks;
 
+use csschecker\Helpers;
+
 class SelectorLengthCheck extends SelectorCheck {
     public function run($selector) {
-        $matches = array();
-        preg_match_all("(\.(?P<classes>-?[_a-zA-Z][_a-zA-Z0-9-]*))", $selector['string'], $matches);
+		$matches = Helpers::getClassesInSelectorString($selector['string']);
 		
         if (count($matches) > $this->config->maxSelectorLength) {
             $this->addWarning($selector['string'], 'Selector is over ' . $this->config->maxSelectorLength . ' levels deep.');
