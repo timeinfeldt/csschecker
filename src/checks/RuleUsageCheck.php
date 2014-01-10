@@ -14,7 +14,7 @@ class RuleUsageCheck extends RuleCheck {
     public function run($rule) {
         if (in_array($rule['name'], $this->whiteList)) {
 
-            usort($rule['values'], function($a, $b) {
+            usort($rule['values'], function ($a, $b) {
                 return $b['defCount'] - $a['defCount'];
             });
 

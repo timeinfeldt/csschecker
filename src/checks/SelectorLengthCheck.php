@@ -4,6 +4,7 @@ namespace csschecker\checks;
 use csschecker\Helpers;
 
 class SelectorLengthCheck extends SelectorCheck {
+
     public function run($selector) {
         $matches = Helpers::getElementsInSelectorString($selector['string']);
 

@@ -1,4 +1,6 @@
 <?php
 namespace csschecker\checks;
 
-abstract class CssFileCheck extends Check {}
+abstract class CssFileCheck extends Check {
+
+}

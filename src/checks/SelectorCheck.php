@@ -1,4 +1,6 @@
 <?php
 namespace csschecker\checks;
 
-abstract class SelectorCheck extends Check {}
+abstract class SelectorCheck extends Check {
+
+}

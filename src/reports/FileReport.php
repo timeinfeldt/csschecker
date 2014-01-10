@@ -17,12 +17,12 @@ class FileReport extends Report {
         $time = microtime(true) - $this->startTime;
 
         $this->write(PHP_EOL);
-        $this->write("CSS check finished after " . number_format($time, 2)  . " seconds." . PHP_EOL);
+        $this->write("CSS check finished after " . number_format($time, 2) . " seconds." . PHP_EOL);
 
         foreach ($this->warnings as $check => $warnings) {
             $this->write($check);
             $this->write("========================");
-            foreach($warnings as $warning) {
+            foreach ($warnings as $warning) {
                 $this->write($warning['entity'] . ": " . $warning['message']);
             }
         }

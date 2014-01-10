@@ -8,19 +8,19 @@
                         <xs:sequence>
                             <xs:element name="error" minOccurs="0" maxOccurs="unbounded">
                                 <xs:complexType>
-                                    <xs:attribute name="line" type="xs:positiveInteger" />
-                                    <xs:attribute name="column" type="xs:positiveInteger" />
-                                    <xs:attribute name="severity" type="xs:string" />
-                                    <xs:attribute name="message" type="xs:string" />
-                                    <xs:attribute name="source" type="xs:string" />
+                                    <xs:attribute name="line" type="xs:positiveInteger"/>
+                                    <xs:attribute name="column" type="xs:positiveInteger"/>
+                                    <xs:attribute name="severity" type="xs:string"/>
+                                    <xs:attribute name="message" type="xs:string"/>
+                                    <xs:attribute name="source" type="xs:string"/>
                                 </xs:complexType>
                             </xs:element>
                         </xs:sequence>
-                        <xs:attribute name="name" type="xs:string" />
+                        <xs:attribute name="name" type="xs:string"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
-            <xs:attribute name="version" type="xs:string" use="optional" />
+            <xs:attribute name="version" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
 </xs:schema>
