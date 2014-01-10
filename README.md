@@ -1,7 +1,7 @@
 Introduction
 =====
 
-Use csschecker to perform a list of checks on your CSS. You can also check the interaction between your CSS and other source files in your project.
+Use csschecker to perform a list of checks on your CSS and its interaction with other source files in your project.
 
 
 Usage
