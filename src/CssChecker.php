@@ -168,8 +168,12 @@ class CssChecker {
                 }
             }
 
+            $fileName = array_pop(explode('/', $cssFileName));
+
+
             $files[] = array(
-                'name' => $cssFileName,
+                'name' => $fileName,
+                'path' => $cssFileName,
                 'declarationsCount' => count($declarations)
             );
 

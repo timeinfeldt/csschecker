@@ -27,3 +27,13 @@ five: Not used.
 levels: Not used.
 deep: Not used.
 action-dislike: Not used.
+csschecker\checks\FileDeclarationsCountCheck
+========================
+test-style-2.css: 1 declaration(s).
+test-style-2.css: 1 declaration(s).
+test-style.css: 7 declaration(s).
+csschecker\checks\FileSizeCheck
+========================
+test-style-2.css: 44 B
+test-style-2.css: 44 B
+test-style.css: 363 B

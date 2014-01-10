@@ -15,8 +15,7 @@ class FileSizeCheck extends CssFileCheck {
     }
 
     public function run($file) {
-        $size = filesize($file['name']);
-
+        $size = filesize($file['path']);
         $this->addWarning($file['name'], $this->formatBytes($size));
     }
 }
