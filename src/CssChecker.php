@@ -274,7 +274,7 @@ class CssChecker {
         }
         $config = json_decode($configFile);
         if ($config === null) {
-            throw new \Exception('Json could not be parsed');
+            throw new \Exception('Json in ' . $configFilePath . ' could not be parsed');
         }
         return $config;
     }
