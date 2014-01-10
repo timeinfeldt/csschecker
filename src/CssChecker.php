@@ -6,6 +6,7 @@ use csschecker\reports\Report;
 class CssChecker {
 
     const RETURN_CODE_ERROR = 1;
+
     const RETURN_CODE_INVALID_CLI_ARGUMENTS = 3;
 
     private $config;

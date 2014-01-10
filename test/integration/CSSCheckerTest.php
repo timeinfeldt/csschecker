@@ -2,27 +2,30 @@
 
 namespace csschecker;
 
-class CSSCheckerTest extends \PHPUnit_Framework_TestCase{
+class CSSCheckerTest extends \PHPUnit_Framework_TestCase {
 
     private $checker;
 
     public function testGetClassesInSelectorString() {
         $this->checker = new CssChecker();
 
-        $t1 = $this->checker->getClassesInSelectorString('.hello .world');
-        $this->assertEquals(array('hello','world'), $t1);
+        $t1 = Helpers::getClassesInSelectorString('.hello .world');
+        $this->assertEquals(array('hello', 'world'), $t1);
 
-        $t2 = $this->checker->getClassesInSelectorString('#hello .world');
+        $t2 = Helpers::getClassesInSelectorString('#hello .world');
         $this->assertEquals(array('world'), $t2);
 
-        $t3 = $this->checker->getClassesInSelectorString('.hello.world');
-        $this->assertEquals(array('hello','world'), $t3);
-		
-		$t4 = $this->checker->getClassesInSelectorString('.hello > .world');
-        $this->assertEquals(array('hello','world'), $t4);
-		
-		
-		$t5 = $this->checker->getClassesInSelectorString('.author-matches .li-pub-cluster-small .pub-cluster-small .btn + .btn');
-        $this->assertCount(5, $t5);
+        $t3 = Helpers::getClassesInSelectorString('.hello.world');
+        $this->assertEquals(array('hello', 'world'), $t3);
+
+        $t4 = Helpers::getClassesInSelectorString('.hello > .world');
+        $this->assertEquals(array('hello', 'world'), $t4);
+    }
+
+    public function testGetElementsInSelectorString() {
+        $this->checker = new CssChecker();
+
+        $t1 = Helpers::getElementsInSelectorString('.hello .world .btn + .btn h4:hover');
+        $this->assertCount(5, $t1);
     }
 }
