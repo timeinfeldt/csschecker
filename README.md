@@ -1,7 +1,9 @@
 Usage
 =====
 
-Example: csschecker --verbose --config myProject/myRules.json myProject/source/ myProject/web/css
+Example: 
+
+    csschecker --verbose --config myProject/myRules.json myProject/source/ myProject/web/css
 
 Options:
 
