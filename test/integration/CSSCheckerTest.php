@@ -27,5 +27,8 @@ class CSSCheckerTest extends \PHPUnit_Framework_TestCase {
 
         $t1 = Helpers::getElementsInSelectorString('.hello .world .btn + .btn h4:hover');
         $this->assertCount(5, $t1);
+
+        $t2 = Helpers::getElementsInSelectorString('.btn-group > .dropdown + .btn');
+        $this->assertCount(3, $t2);
     }
 }
