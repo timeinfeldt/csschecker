@@ -168,7 +168,7 @@ class CssChecker {
                 }
             }
 
-            $fileNameParts = explode('/', $cssFileName)
+            $fileNameParts = explode('/', $cssFileName);
             $fileName = array_pop($fileNameParts);
 
             $files[] = array(
