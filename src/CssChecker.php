@@ -2,6 +2,9 @@
 namespace csschecker;
 
 use csschecker\reports\Report;
+use Sabberworm\CSS\Property\Selector;
+use Sabberworm\CSS\Rule\Rule;
+use Sabberworm\CSS\RuleSet\DeclarationBlock;
 
 class CssChecker {
 
@@ -57,7 +60,7 @@ class CssChecker {
         }
 
         if (count($paths) != 2) {
-            $this->printUsage('Invalid CLI arguments. Please provide a code directory and a css directory.');
+            $this->printUsage();
             die(self::RETURN_CODE_INVALID_CLI_ARGUMENTS);
         }
 
@@ -137,17 +140,22 @@ class CssChecker {
 
             $oCss = $this->parseCSSFile($cssFileName);
 
+            /** @var DeclarationBlock[] $declarations */
             $declarations = $oCss->getAllDeclarationBlocks();
 
             foreach ($declarations as $oBlock) {
-                foreach ($oBlock->getSelectors() as $oSelector) {
+                /** @var Selector[] $selectors */
+                $selectors = $oBlock->getSelectors();
+                foreach ($selectors as $oSelector) {
                     $selectors[] = array(
                         'string' => $oSelector->getSelector(),
                         'defLocation' => $cssFileName
                     );
                 }
 
-                foreach ($oBlock->getRules() as $oRule) {
+                /** @var Rule[] $rules */
+                $rules = $oBlock->getRules();
+                foreach ($rules as $oRule) {
                     $rule = $oRule->getRule();
                     $val = (string) $oRule->getValue();
 
