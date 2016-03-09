@@ -144,18 +144,18 @@ class CssChecker {
             $declarations = $oCss->getAllDeclarationBlocks();
 
             foreach ($declarations as $oBlock) {
-                /** @var Selector[] $selectors */
-                $selectors = $oBlock->getSelectors();
-                foreach ($selectors as $oSelector) {
+                /** @var Selector[] $oSelectors */
+                $oSelectors = $oBlock->getSelectors();
+                foreach ($oSelectors as $oSelector) {
                     $selectors[] = array(
                         'string' => $oSelector->getSelector(),
                         'defLocation' => $cssFileName
                     );
                 }
 
-                /** @var Rule[] $rules */
-                $rules = $oBlock->getRules();
-                foreach ($rules as $oRule) {
+                /** @var Rule[] $oRules */
+                $oRules = $oBlock->getRules();
+                foreach ($oRules as $oRule) {
                     $rule = $oRule->getRule();
                     $val = (string) $oRule->getValue();
 
